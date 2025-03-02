@@ -8,10 +8,11 @@ typedef struct{
     long double converted_nums[sizeof(long double) * ARRAY_SIZE];
 } parsedEquation;
 
+/* Put this in a seprate header file */
 void removeSpaces(char * str);
 parsedEquation * parseCalculation(char * original_equation);
 
-
+/* main should be the last function on the file not the first one */
 int main(){
     char equation[ARRAY_SIZE];
     parsedEquation * parsed_nums;
@@ -24,40 +25,24 @@ int main(){
     char * pOperators = parsed_nums->operators;
     long double * pConverted_nums = parsed_nums->converted_nums;
     long double sum = 0;
-    long double power_sum = 1;
-    long double base = 0;
-    long double power = 0;
 
     // printf("%c", *parsed_nums->operators);
     while(*pOperators){
-        switch(*pOperators++){
+        if(sum == 0){
+            sum += *(pConverted_nums++);
+        }
+        switch(*(pOperators++)){
             case '+':
-                if(sum == 0){
-                    sum += *pConverted_nums++;
-                }
-                sum += *pConverted_nums++;
+                sum += *(pConverted_nums++);
                 break;
             case '-':
-                if(sum == 0){
-                    sum += *pConverted_nums++;
-                }
-                sum -= *pConverted_nums++;
+                sum -= *(pConverted_nums++);
                 break;
             case '*':
-                if(sum == 0){
-                    sum += *pConverted_nums++;
-                }
-                sum *= *pConverted_nums++;
+                sum *= *(pConverted_nums++);
                 break;
             case '/':
-                if(sum == 0){
-                    sum += *pConverted_nums++;
-                }
-                if(*pConverted_nums == 0){
-                    printf("Cannot divide by 0.");
-                    return 2;
-                }
-                sum /= *pConverted_nums++;
+                sum /= *(pConverted_nums++);
                 break;
             default:
                 printf("Invalid input.\n");
@@ -81,17 +66,17 @@ parsedEquation * parseCalculation(char * original_equation){
 
     while(*original_equation){
         if(*original_equation >= '0' && *original_equation <= '9' || *original_equation == '.'){
-            num_hold[num_hold_index++] = *original_equation++;
+            num_hold[num_hold_index++] = *(original_equation++);
         }
         else{
-            *pConverted_nums++ = strtold(num_hold, NULL);
+            *(pConverted_nums++) = strtold(num_hold, NULL);
             strncpy(num_hold, "", sizeof(num_hold));
             num_hold_index = 0;
 
-            *pOperators++ = *original_equation++;
+            *(pOperators++) = *(original_equation++);
         }
     }
-    *--pOperators = '\0';
+    *(--pOperators) = '\0';
     return parsed_nums;
 }
 
@@ -102,5 +87,5 @@ void removeSpaces(char* str) {
         while (*temp == ' ') {
             ++temp;
         }
-    } while (*str++ = *temp++);
+    } while (*(str++) = *(temp++));
 }
